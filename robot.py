@@ -5,7 +5,7 @@ from threading import Thread
 from importlib import import_module
 import os
 
-socketIO = SocketIO('localhost', 8080, LoggingNamespace)
+socketIO = SocketIO('192.168.1.129', 8080)
 
 # Import the PCA9685 module.
 import Adafruit_PCA9685
@@ -51,36 +51,36 @@ def stop():
 
 def on_message(*args):
     #Retrieve the message from the args tuple
-    print(args[0][14:17])
-    data = args[0][14:17]
+    print(args[0])
+    data = args[0]
 
-    if data == 'for': # Forward
+    if data == 'forward': # Forward
         forwards()
-    elif data == 'lef': # Left
+    elif data == 'left': # Left
         left()
-    elif data == 'rig': # Right
+    elif data == 'right': # Right
         right()
-    elif data == 'bac': # Backward
+    elif data == 'backward': # Backward
         backwards()
-    elif data == 'hop': # Hand Open
+    elif data == 'hopen': # Hand Open
         print('Hand Open')
         pwm.set_pwm(2,0,155)
         socketIO.wait(seconds=1)
         pwm.set_pwm(2,0,0)
-    elif data == 'hcl': # Hand Close
+    elif data == 'hclose': # Hand Close
         print('Hand Close')
         pwm.set_pwm(2,0,420)
         socketIO.wait(seconds=1)
         pwm.set_pwm(2,0,0)    
-    elif data == 'sto': # Stop
+    elif data == 'stop': # Stop
         stop()
-    elif data == 'plf':
+    elif data == 'panleft':
         print('Pan Left')
         pwm.set_pwm(5,0,550)
         socketIO.wait(seconds=1)
         pwm.set_pwm(5,0,0)
 
-    elif data == 'prt':
+    elif data == 'panright':
         print('Pan Right')
         pwm.set_pwm(5,0,200)
         socketIO.wait(seconds=1)
@@ -92,28 +92,19 @@ def on_message(*args):
         socketIO.wait(seconds=1)
         pwm.set_pwm(4,0,0)
 
-    elif data == 'tdw':
+    elif data == 'tdown':
         print('Tilt Down')
         pwm.set_pwm(4,0,700)
         socketIO.wait(seconds=1)
         pwm.set_pwm(4,0,0)
 
-    elif data == 'cen':
+    elif data == 'center':
         print('Center')
         pwm.set_pwm(4,0,450)
         pwm.set_pwm(5,0,375)
         socketIO.wait(seconds=1)
         pwm.set_pwm(4,0,0)
         pwm.set_pwm(5,0,0)
-    else: # Otherwise Stop
-        stop()
 
-
-def listen():
-    while True:
-        socketIO.on('message', on_message)
-        socketIO.wait()
-        socketIO.off('message')
-
-t = Thread(target=listen)
-t.start()
+socketIO.on('move', on_message)
+socketIO.wait()
