@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Robot Server</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 shrink-to-fit=no">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script>
+        var socket = io.connect("http://localhost:8080");
+        socket.on('connect', function() {
+          document.addEventListener("click", function (e) {
+
+              if (e.target.id) {
+                console.log(e.target.id);
+                socket.emit('Mov',e.target.id);
+              }
+          });
+         });
+        
+        socket.on('frame', function(){
+            console.log("Image Received");
+            d = new Date()
+            $( "#camera img" ).attr('src', 'static/test.jpg' + '?' + d.getTime());
+       });
+    </script>
+  </head>
+
+  <body>
+    <div class="container text-center">
+        <h1>Video Feed</h1>
+        <div id="camera">
+            <img src="{{url_for('static', filename='test.jpg')}}">
+        </div>
+        <br>
+        <div>
+            <h3>Movement Controls</h3>
+            <div class="btn-group">
+                <input type="button" class="btn btn-primary" id="forward" value="Forward"/>
+                <input type="button" class="btn btn-primary" id="backward" value="Backward"/>
+                <input type="button" class="btn btn-primary" id="left" value="Left"/>
+                <input type="button" class="btn btn-primary" id="right" value="Right"/>
+                <input type="button" class="btn btn-primary" id="stop" value="Stop"/>
+            </div>
+        </div>
+        <div>
+            <h3>Camera Controls</h3>
+            <div class="btn-group">
+                <input type="button" class="btn btn-secondary" id="panright" value="Pan Right"/>
+                <input type="button" class="btn btn-secondary" id="panleft" value="Pan Left"/>
+                <input type="button" class="btn btn-secondary" id="tup" value="Tilt Up"/>
+                <input type="button" class="btn btn-secondary" id="tdown" value="Tilt Down"/>
+                <input type="button" class="btn btn-secondary" id="center" value="Center"/>
+            </div>
+        </div>
+        <div>
+            <h3>Hand Controls</h3>
+            <div class="btn-group">
+                <input type="button" class="btn btn-secondary" id="hclose" value="Hand Close"/>
+                <input type="button" class="btn btn-secondary" id="hopen" value="Hand Open"/>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
