@@ -10,24 +10,22 @@ import pickle
 from PIL import Image
 
 socketIO = SocketIO('localhost', 8080)
-
 camera = picamera.PiCamera()
 camera.resolution = (320, 240)
-# Start a preview and let the camera warm up
+camera.framerate = 10
+# Start a preview and let the camera warm up 
 camera.start_preview()
 time.sleep(0.1)
+stream = io.BytesIO()
 
-while True:
-    stream = io.BytesIO()
-    for foo in camera.capture_continuous(stream, 'jpeg'):
-        # Rewind the stream and send the image data over the wire
-        stream.seek(0)
-        image = stream.read()
-        i = pickle.dumps(image)
-        socketIO.emit('vid', i)
-        print('Sent')
-        # Reset the stream for the next capture
-        time.sleep(0.1)
-        stream.seek(0)
-        stream.truncate()
-
+for foo in camera.capture_continuous(stream, 'jpeg'):
+    # Rewind the stream and send the image data over the wire
+    stream.seek(0)
+    image = stream.read()
+    i = pickle.dumps(image)
+    socketIO.emit('vid', i)
+    print('Sent')
+    # Reset the stream for the next capture
+    time.sleep(0.1)
+    stream.seek(0)
+    stream.truncate()
